@@ -1,9 +1,9 @@
 {
-    "name": "terminal42/contao-build-tools",
+    "name": "plenta/contao-build-tools",
     "type": "composer-plugin",
     "description": "Highly opinionated build tool setup for Contao websites.",
     "keywords": ["contao", "ci", "cq", "code-style", "rector"],
-    "homepage": "https://github.com/terminal42/contao-build-tools",
+    "homepage": "https://github.com/plenta/contao-build-tools",
     "license": "MIT",
     "authors": [
         {
@@ -25,7 +25,8 @@
         "composer-plugin-api": "^2.0",
         "composer/semver": "^3.0",
         "symfony/filesystem": "^3 || ^4 || ^5 || ^6 || ^7",
-        "symfony/process": "^4.2 || ^5 || ^6 || ^7"
+        "symfony/process": "^4.2 || ^5 || ^6 || ^7",
+        "captainhook/captainhook":  "^5.27"
     },
     "require-dev": {
         "deployer/deployer": "^7.0 || ^8.0",

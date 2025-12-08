@@ -48,9 +48,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
         $this->registerConfigScript(
             ['ecs', 'cs-fixer'],
-            'Run code style fixes on the project files [terminal42/contao-build-tools].',
-            '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/terminal42/contao-build-tools/tools/ecs/config/%s.php --fix --ansi',
-            '@php vendor/terminal42/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/terminal42/contao-build-tools/tools/ecs/config/%s.php --no-progress-bar --no-interaction',
+            'Run code style fixes on the project files [plenta/contao-build-tools].',
+            '@php vendor/plenta/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/plenta/contao-build-tools/tools/ecs/config/%s.php --fix --ansi',
+            '@php vendor/plenta/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/plenta/contao-build-tools/tools/ecs/config/%s.php --no-progress-bar --no-interaction',
             [
                 'default' => $phpSources,
                 'contao' => ['./contao', self::LEGACY_MODULES],
@@ -61,9 +61,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
         $this->registerConfigScript(
             'rector',
-            'Run Rector on the project files [terminal42/contao-build-tools].',
-            '@php vendor/terminal42/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/terminal42/contao-build-tools/tools/rector/%s.php --ansi',
-            '@php vendor/terminal42/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/terminal42/contao-build-tools/tools/rector/%s.php --dry-run --no-progress-bar --no-diffs',
+            'Run Rector on the project files [plenta/contao-build-tools].',
+            '@php vendor/plenta/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/plenta/contao-build-tools/tools/rector/%s.php --ansi',
+            '@php vendor/plenta/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/plenta/contao-build-tools/tools/rector/%s.php --dry-run --no-progress-bar --no-diffs',
             [
                 'config' => [...$phpSources, './contao', './templates', self::LEGACY_MODULES]
             ],
@@ -72,8 +72,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
         $this->registerConfigScript(
             'phpstan',
-            'Run PHPStan on the project files [terminal42/contao-build-tools].',
-            '@php vendor/terminal42/contao-build-tools/tools/phpstan/vendor/bin/phpstan analyze %s --ansi --configuration=vendor/terminal42/contao-build-tools/tools/phpstan/%s.php',
+            'Run PHPStan on the project files [plenta/contao-build-tools].',
+            '@php vendor/plenta/contao-build-tools/tools/phpstan/vendor/bin/phpstan analyze %s --ansi --configuration=vendor/plenta/contao-build-tools/tools/phpstan/%s.php',
             null,
             [
                 'config' => [...$phpSources, self::LEGACY_MODULES]
@@ -83,8 +83,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
         $this->registerConfigScript(
             'depcheck',
-            'Run Dependency Analyzer on the project files [terminal42/contao-build-tools].',
-            '@php vendor/terminal42/contao-build-tools/tools/composer-dependency-analyser/vendor/bin/composer-dependency-analyser --composer-json=%s --config=vendor/terminal42/contao-build-tools/tools/composer-dependency-analyser/%s.php',
+            'Run Dependency Analyzer on the project files [plenta/contao-build-tools].',
+            '@php vendor/plenta/contao-build-tools/tools/composer-dependency-analyser/vendor/bin/composer-dependency-analyser --composer-json=%s --config=vendor/plenta/contao-build-tools/tools/composer-dependency-analyser/%s.php',
             null,
             [
                 'config' => ['./composer.json'],
@@ -94,8 +94,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
         $this->registerConfigScript(
             'yamllint',
-            'Run yamllint on the project files [terminal42/contao-build-tools].',
-            'vendor/terminal42/contao-build-tools/tools/yamllint/vendor/bin/yaml-lint --parse-tags %s',
+            'Run yamllint on the project files [plenta/contao-build-tools].',
+            'vendor/plenta/contao-build-tools/tools/yamllint/vendor/bin/yaml-lint --parse-tags %s',
             null,
             [
                 '' => ['./config', './github'],
@@ -105,9 +105,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
         $this->registerConfigScript(
             'stylelint',
-            'Run stylelint on the project files [terminal42/contao-build-tools].',
-            'vendor/terminal42/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/terminal42/contao-build-tools/tools/stylelint/%s --allow-empty-input --fix',
-            'vendor/terminal42/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/terminal42/contao-build-tools/tools/stylelint/%s --allow-empty-input',
+            'Run stylelint on the project files [plenta/contao-build-tools].',
+            'vendor/plenta/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/plenta/contao-build-tools/tools/stylelint/%s --allow-empty-input --fix',
+            'vendor/plenta/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/plenta/contao-build-tools/tools/stylelint/%s --allow-empty-input',
             [
                 'stylelint.config.js' => array_filter(['./layout' => './layout/**/*.s?(a|c)ss', './assets' => $isProject ? null : './assets/**/*.s?(a|c)ss']),
             ],
@@ -116,9 +116,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
         $this->registerConfigScript(
             'eslint',
-            'Run eslint on the project files [terminal42/contao-build-tools].',
-            'vendor/terminal42/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/terminal42/contao-build-tools/tools/eslint/%s --resolve-plugins-relative-to vendor/terminal42/contao-build-tools/tools/eslint/ --report-unused-disable-directives --no-error-on-unmatched-pattern --fix',
-            'vendor/terminal42/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/terminal42/contao-build-tools/tools/eslint/%s --resolve-plugins-relative-to vendor/terminal42/contao-build-tools/tools/eslint/ --report-unused-disable-directives --no-error-on-unmatched-pattern',
+            'Run eslint on the project files [plenta/contao-build-tools].',
+            'vendor/plenta/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/plenta/contao-build-tools/tools/eslint/%s --resolve-plugins-relative-to vendor/plenta/contao-build-tools/tools/eslint/ --report-unused-disable-directives --no-error-on-unmatched-pattern --fix',
+            'vendor/plenta/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/plenta/contao-build-tools/tools/eslint/%s --resolve-plugins-relative-to vendor/plenta/contao-build-tools/tools/eslint/ --report-unused-disable-directives --no-error-on-unmatched-pattern',
             [
                 '.eslintrc.json' => array_filter(['./layout' => './layout/**/*.js', './assets' => $isProject ? null : './assets/**/*.js']),
             ],
@@ -127,9 +127,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
         $this->registerConfigScript(
             'biome',
-            'Run biome on the project files [terminal42/contao-build-tools].',
-            'vendor/terminal42/contao-build-tools/tools/biome/node_modules/.bin/biome check %s --write --unsafe  --config-path=vendor/terminal42/contao-build-tools/tools/biome/%s --no-errors-on-unmatched',
-            'vendor/terminal42/contao-build-tools/tools/biome/node_modules/.bin/biome ci %s --config-path=vendor/terminal42/contao-build-tools/tools/biome/%s --no-errors-on-unmatched',
+            'Run biome on the project files [plenta/contao-build-tools].',
+            'vendor/plenta/contao-build-tools/tools/biome/node_modules/.bin/biome check %s --write --unsafe  --config-path=vendor/plenta/contao-build-tools/tools/biome/%s --no-errors-on-unmatched',
+            'vendor/plenta/contao-build-tools/tools/biome/node_modules/.bin/biome ci %s --config-path=vendor/plenta/contao-build-tools/tools/biome/%s --no-errors-on-unmatched',
             [
                 'biome.json' => array_filter(['./layout' => './layout/', './assets' => $isProject ? null : './assets/']),
             ],
@@ -297,8 +297,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             $this->scriptAliases[$name] = $aliases;
 
             if ($addToTools) {
-                $this->activatedScripts[self::CI_SCRIPT] = 'Run all tools for a CI build chain [terminal42/contao-build-tools].';
-                $this->activatedScripts[self::FIX_SCRIPT] = 'Run fixers of all CI tools [terminal42/contao-build-tools].';
+                $this->activatedScripts[self::CI_SCRIPT] = 'Run all tools for a CI build chain [plenta/contao-build-tools].';
+                $this->activatedScripts[self::FIX_SCRIPT] = 'Run fixers of all CI tools [plenta/contao-build-tools].';
             }
         }
     }

@@ -48,7 +48,9 @@ $config
     ->enableAnalysisOfUnusedDevDependencies()
     ->disableReportingUnmatchedIgnores()
 
-    ->ignoreErrorsOnPackage('terminal42/contao-build-tools', [ErrorType::UNUSED_DEPENDENCY])
+    ->ignoreErrorsOnPackage('plenta/contao-build-tools', [ErrorType::UNUSED_DEPENDENCY])
+    ->ignoreErrorsOnPackage('captainhook/captainhook', [ErrorType::UNUSED_DEPENDENCY])
+    ->ignoreErrorsOnPackage('friendsofphp/php-cs-fixer', [ErrorType::UNUSED_DEPENDENCY])
 ;
 
 if (file_exists('./deploy.php')) {

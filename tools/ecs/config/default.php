@@ -6,6 +6,10 @@ use Composer\Semver\VersionParser;
 use Contao\EasyCodingStandard\Fixer\CommentLengthFixer;
 use Contao\EasyCodingStandard\Fixer\TypeHintOrderFixer;
 use PhpCsFixer\Fixer\Comment\HeaderCommentFixer;
+use PhpCsFixer\Fixer\Phpdoc\GeneralPhpdocAnnotationRemoveFixer;
+use PhpCsFixer\Fixer\Phpdoc\PhpdocNoAliasTagFixer;
+use PhpCsFixer\Fixer\Phpdoc\PhpdocSeparationFixer;
+use PhpCsFixer\Fixer\Phpdoc\PhpdocSummaryFixer;
 use PhpCsFixer\Fixer\Whitespace\MethodChainingIndentationFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 
@@ -17,6 +21,11 @@ return static function (ECSConfig $ecsConfig): void {
         MethodChainingIndentationFixer::class => [
             '*/DependencyInjection/Configuration.php',
         ],
+        HeaderCommentFixer::class,
+        GeneralPhpdocAnnotationRemoveFixer::class,
+        PhpdocNoAliasTagFixer::class,
+        PhpdocSeparationFixer::class,
+        PhpdocSummaryFixer::class
     ];
 
     if (file_exists(getcwd().'/composer.json')) {
