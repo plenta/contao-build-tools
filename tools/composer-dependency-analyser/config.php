@@ -51,6 +51,7 @@ $config
     ->ignoreErrorsOnPackage('plenta/contao-build-tools', [ErrorType::UNUSED_DEPENDENCY])
     ->ignoreErrorsOnPackage('captainhook/captainhook', [ErrorType::UNUSED_DEPENDENCY])
     ->ignoreErrorsOnPackage('friendsofphp/php-cs-fixer', [ErrorType::UNUSED_DEPENDENCY])
+    ->ignoreErrorsOnPackage('symfony/webpack-encore-bundle', [ErrorType::UNUSED_DEPENDENCY])
 ;
 
 if (file_exists('./deploy.php')) {
