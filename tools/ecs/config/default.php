@@ -21,7 +21,6 @@ return static function (ECSConfig $ecsConfig): void {
         MethodChainingIndentationFixer::class => [
             '*/DependencyInjection/Configuration.php',
         ],
-        HeaderCommentFixer::class,
         GeneralPhpdocAnnotationRemoveFixer::class,
         PhpdocNoAliasTagFixer::class,
         PhpdocSeparationFixer::class,
@@ -41,7 +40,6 @@ return static function (ECSConfig $ecsConfig): void {
         }
     }
 
-    $ecsConfig->ruleWithConfiguration(HeaderCommentFixer::class, ['header' => '']);
     $ecsConfig->skip($skip);
     $ecsConfig->parallel();
     $ecsConfig->lineEnding("\n");
