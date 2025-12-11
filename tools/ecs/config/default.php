@@ -11,6 +11,7 @@ use PhpCsFixer\Fixer\Phpdoc\PhpdocNoAliasTagFixer;
 use PhpCsFixer\Fixer\Phpdoc\PhpdocSeparationFixer;
 use PhpCsFixer\Fixer\Phpdoc\PhpdocSummaryFixer;
 use PhpCsFixer\Fixer\Whitespace\MethodChainingIndentationFixer;
+use SlevomatCodingStandard\Sniffs\Namespaces\ReferenceUsedNamesOnlySniff;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 
 return static function (ECSConfig $ecsConfig): void {
@@ -24,7 +25,7 @@ return static function (ECSConfig $ecsConfig): void {
         GeneralPhpdocAnnotationRemoveFixer::class,
         PhpdocNoAliasTagFixer::class,
         PhpdocSeparationFixer::class,
-        PhpdocSummaryFixer::class
+        PhpdocSummaryFixer::class,
     ];
 
     if (file_exists(getcwd().'/composer.json')) {

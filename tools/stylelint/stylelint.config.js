@@ -25,6 +25,7 @@ let config = {
         "custom-property-pattern": null,
         "scss/dollar-variable-pattern": null,
         "comment-whitespace-inside": "always",
+        "selector-pseudo-element-colon-notation": "single",
         "scss/double-slash-comment-whitespace-inside": "always",
         "font-family-no-missing-generic-family-keyword": [
             true,
