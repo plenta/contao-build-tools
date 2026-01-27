@@ -117,10 +117,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         $this->registerConfigScript(
             'eslint',
             'Run eslint on the project files [plenta/contao-build-tools].',
-            'vendor/plenta/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/plenta/contao-build-tools/tools/eslint/%s --resolve-plugins-relative-to vendor/plenta/contao-build-tools/tools/eslint/ --report-unused-disable-directives --no-error-on-unmatched-pattern --fix',
-            'vendor/plenta/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/plenta/contao-build-tools/tools/eslint/%s --resolve-plugins-relative-to vendor/plenta/contao-build-tools/tools/eslint/ --report-unused-disable-directives --no-error-on-unmatched-pattern',
+            'vendor/plenta/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/plenta/contao-build-tools/tools/eslint/%s --report-unused-disable-directives --no-error-on-unmatched-pattern --fix',
+            'vendor/plenta/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/plenta/contao-build-tools/tools/eslint/%s --report-unused-disable-directives --no-error-on-unmatched-pattern',
             [
-                '.eslintrc.json' => array_filter(['./layout' => './layout/**/*.js', './assets' => $isProject ? null : './assets/**/*.js']),
+                'eslint.config.js' => array_filter(['./layout' => './layout/**/*.js', './assets' => $isProject ? null : './assets/**/*.js']),
             ],
             $scripts
         );
@@ -136,7 +136,23 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             $scripts,
         );
 
+        $this->registerConfigScript(
+            'twig-cs-fixer',
+            'Run Twig-CS-Fixer on the project files [plenta/contao-build-tools].',
+            'vendor/plenta/contao-build-tools/tools/twig-cs-fixer/vendor/bin/twig-cs-fixer fix %s --config=vendor/plenta/contao-build-tools/tools/twig-cs-fixer/%s.php -v',
+            'vendor/plenta/contao-build-tools/tools/twig-cs-fixer/vendor/bin/twig-cs-fixer check %s --config=vendor/plenta/contao-build-tools/tools/twig-cs-fixer/%s.php -v',
+            [
+                'config' => ['./templates', './contao/templates'],
+            ],
+            $scripts,
+        );
+
         $rootPackage = $composer->getPackage();
+
+        if (isset($rootPackage->getScripts()['unit-tests'])) {
+            $scripts[self::FIX_SCRIPT][] = '@unit-tests';
+        }
+
         $rootPackage->setScripts(
             array_merge(
                 array_diff_key($scripts, $rootPackage->getScripts()),

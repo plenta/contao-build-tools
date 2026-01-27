@@ -49,6 +49,9 @@ let config = {
                 ]
             }
         ],
+        "import-notation": "string",
+        "max-nesting-depth": null,
+        "selector-no-qualifying-type": null,
         "prettier/prettier": [
             true,
             {

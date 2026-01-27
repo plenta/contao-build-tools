@@ -10,8 +10,10 @@ use Rector\Doctrine\Set\DoctrineSetList;
 use Rector\Php70\Rector\FuncCall\RandomFunctionRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Array_\FirstClassCallableRector;
+use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
+use Rector\Symfony\Symfony72\Rector\StmtsAwareInterface\PushRequestToRequestStackConstructorRector;
 
 return static function (RectorConfig $rectorConfig): void {
 
@@ -24,11 +26,12 @@ return static function (RectorConfig $rectorConfig): void {
 
     if ($contaoConstraint = $composerJson['require']['contao/core-bundle'] ?? $composerJson['require']['contao/manager-bundle'] ?? $composerJson['require-dev']['contao/core-bundle'] ?? $composerJson['require-dev']['contao/manager-bundle'] ?? null) {
         $parsedConstraints = $versionParser->parseConstraints($contaoConstraint);
+        $isContao4 = $parsedConstraints->matches($versionParser->parseConstraints('< 5.0'));
 
         $setList = match (true) {
             $parsedConstraints->matches($versionParser->parseConstraints('< 4.9')) => [],
             $parsedConstraints->matches($versionParser->parseConstraints('< 4.10')) => [ContaoLevelSetList::UP_TO_CONTAO_49],
-            $parsedConstraints->matches($versionParser->parseConstraints('< 5.0')) => [ContaoLevelSetList::UP_TO_CONTAO_413],
+            $isContao4 => [ContaoLevelSetList::UP_TO_CONTAO_413],
             $parsedConstraints->matches($versionParser->parseConstraints('< 5.1')) => [ContaoLevelSetList::UP_TO_CONTAO_50],
             $parsedConstraints->matches($versionParser->parseConstraints('< 5.3')) => [ContaoLevelSetList::UP_TO_CONTAO_51],
             $parsedConstraints->matches($versionParser->parseConstraints('< 5.4')) => [ContaoLevelSetList::UP_TO_CONTAO_53],
@@ -38,6 +41,11 @@ return static function (RectorConfig $rectorConfig): void {
 
         if (!empty($setList)) {
             $rectorConfig->sets($setList);
+        }
+
+        if ($isContao4) {
+            // Request stack constructor argument is not available in Contao 4.13
+            $rectorConfig->skip([PushRequestToRequestStackConstructorRector::class]);
         }
     }
 
@@ -54,11 +62,39 @@ return static function (RectorConfig $rectorConfig): void {
             $parsedConstraints->matches($versionParser->parseConstraints('< 8.2')) => [LevelSetList::UP_TO_PHP_81, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
             $parsedConstraints->matches($versionParser->parseConstraints('< 8.3')) => [LevelSetList::UP_TO_PHP_82, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
             $parsedConstraints->matches($versionParser->parseConstraints('< 8.4')) => [LevelSetList::UP_TO_PHP_83, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
-            $parsedConstraints->matches($versionParser->parseConstraints('^8.4')) => [LevelSetList::UP_TO_PHP_84, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
+            $parsedConstraints->matches($versionParser->parseConstraints('< 8.5')) => [LevelSetList::UP_TO_PHP_84, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
+            $parsedConstraints->matches($versionParser->parseConstraints('^8.5')) => [LevelSetList::UP_TO_PHP_85, ContaoSetList::ANNOTATIONS_TO_ATTRIBUTES, DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES],
         };
 
         if (!empty($setList)) {
             $rectorConfig->sets($setList);
+        }
+    }
+
+    if ($phpunitConstraint = $composerJson['require-dev']['phpunit/phpunit'] ?? null) {
+        $parsedConstraints = $versionParser->parseConstraints($phpunitConstraint);
+        $setList = [
+            '>= 4.0' => PHPUnitSetList::PHPUNIT_40,
+            '>= 5.0' => PHPUnitSetList::PHPUNIT_50,
+            '>= 6.0' => PHPUnitSetList::PHPUNIT_60,
+            '>= 7.0' => PHPUnitSetList::PHPUNIT_70,
+            '>= 8.0' => PHPUnitSetList::PHPUNIT_80,
+            '>= 9.0' => PHPUnitSetList::PHPUNIT_90,
+            '>= 10.0' => PHPUnitSetList::PHPUNIT_100,
+            '>= 11.0' => PHPUnitSetList::PHPUNIT_110,
+            '>= 12.0' => PHPUnitSetList::PHPUNIT_120,
+        ];
+
+        $setList = array_filter(
+            $setList,
+            static fn ($constraint) => $parsedConstraints->matches($versionParser->parseConstraints($constraint)),
+            ARRAY_FILTER_USE_KEY,
+        );
+
+        if (!empty($setList)) {
+            $setList[] = PHPUnitSetList::PHPUNIT_CODE_QUALITY;
+            $setList[] = PHPUnitSetList::ANNOTATIONS_TO_ATTRIBUTES;
+            $rectorConfig->sets(array_values($setList));
         }
     }
 
@@ -79,12 +115,6 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->skip([
         ClassPropertyAssignToConstructorPromotionRector::class => [
             '*/Entity/'
-        ],
-
-        // Make sure hooks and callbacks are not converted to first class callables
-        FirstClassCallableRector::class => [
-            '*/config.php',
-            '*/dca/*.php',
         ],
 
         // Allow rand() in templates (e.g. for Isotope eCommerce)
