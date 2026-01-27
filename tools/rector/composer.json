@@ -3,5 +3,8 @@
         "rector/rector": "2.2.11",
         "contao/contao-rector": "dev-main",
         "composer/semver": "^3.4"
+    },
+    "conflict": {
+        "phpstan/phpstan": "^2.1.34"
     }
 }
