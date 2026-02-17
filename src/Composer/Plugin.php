@@ -95,7 +95,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         $this->registerConfigScript(
             'yamllint',
             'Run yamllint on the project files [plenta/contao-build-tools].',
-            'vendor/plenta/contao-build-tools/tools/yamllint/vendor/bin/yaml-lint --parse-tags %s',
+            '@php vendor/plenta/contao-build-tools/tools/yamllint/vendor/bin/yaml-lint --parse-tags %s',
             null,
             [
                 '' => ['./config', './github'],
@@ -139,8 +139,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         $this->registerConfigScript(
             'twig-cs-fixer',
             'Run Twig-CS-Fixer on the project files [plenta/contao-build-tools].',
-            'vendor/plenta/contao-build-tools/tools/twig-cs-fixer/vendor/bin/twig-cs-fixer fix %s --config=vendor/plenta/contao-build-tools/tools/twig-cs-fixer/%s.php -v',
-            'vendor/plenta/contao-build-tools/tools/twig-cs-fixer/vendor/bin/twig-cs-fixer check %s --config=vendor/plenta/contao-build-tools/tools/twig-cs-fixer/%s.php -v',
+            '@php vendor/plenta/contao-build-tools/tools/twig-cs-fixer/vendor/bin/twig-cs-fixer fix %s --config=vendor/plenta/contao-build-tools/tools/twig-cs-fixer/%s.php -v',
+            '@php vendor/plenta/contao-build-tools/tools/twig-cs-fixer/vendor/bin/twig-cs-fixer check %s --config=vendor/plenta/contao-build-tools/tools/twig-cs-fixer/%s.php -v',
             [
                 'config' => ['./templates', './contao/templates'],
             ],
