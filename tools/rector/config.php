@@ -14,6 +14,9 @@ use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
 use Rector\Symfony\Symfony72\Rector\StmtsAwareInterface\PushRequestToRequestStackConstructorRector;
+use Rector\Symfony\Symfony73\GetMethodToAsTwigAttributeTransformer;
+use Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector;
+use Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector;
 
 return static function (RectorConfig $rectorConfig): void {
 
@@ -121,6 +124,10 @@ return static function (RectorConfig $rectorConfig): void {
         RandomFunctionRector::class => [
             '*.html5'
         ],
+
+        GetFiltersToAsTwigFilterAttributeRector::class,
+        GetFunctionsToAsTwigFunctionAttributeRector::class,
+        GetMethodToAsTwigAttributeTransformer::class,
     ]);
 
     $rectorConfig->fileExtensions(['php', 'html5']);
