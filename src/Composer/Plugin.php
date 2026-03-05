@@ -109,7 +109,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             'vendor/plenta/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/plenta/contao-build-tools/tools/stylelint/%s --allow-empty-input --fix',
             'vendor/plenta/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/plenta/contao-build-tools/tools/stylelint/%s --allow-empty-input',
             [
-                'stylelint.config.js' => array_filter(['./layout' => './layout/**/*.s?(a|c)ss', './assets' => $isProject ? null : './assets/**/*.s?(a|c)ss']),
+                'stylelint.config.js' => array_filter(['./layout' => './layout/**/*.s?(a|c)ss', './assets' => $isProject ? null : './assets/**/*.s?(a|c)ss', './assets-webpack' => './assets-webpack/**/*.s?(a|c)ss']),
             ],
             $scripts
         );
@@ -120,7 +120,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             'vendor/plenta/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/plenta/contao-build-tools/tools/eslint/%s --report-unused-disable-directives --no-error-on-unmatched-pattern --fix',
             'vendor/plenta/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/plenta/contao-build-tools/tools/eslint/%s --report-unused-disable-directives --no-error-on-unmatched-pattern',
             [
-                'eslint.config.js' => array_filter(['./layout' => './layout/**/*.js', './assets' => $isProject ? null : './assets/**/*.js']),
+                'eslint.config.js' => array_filter(['./layout' => './layout/**/*.js', './assets' => $isProject ? null : './assets/**/*.js', './assets-webpack' => './assets-webpack/**/*.js']),
             ],
             $scripts
         );
@@ -131,7 +131,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             'vendor/plenta/contao-build-tools/tools/biome/node_modules/.bin/biome check %s --write --unsafe  --config-path=vendor/plenta/contao-build-tools/tools/biome/%s --no-errors-on-unmatched',
             'vendor/plenta/contao-build-tools/tools/biome/node_modules/.bin/biome ci %s --config-path=vendor/plenta/contao-build-tools/tools/biome/%s --no-errors-on-unmatched',
             [
-                'biome.json' => array_filter(['./layout' => './layout/', './assets' => $isProject ? null : './assets/']),
+                'biome.json' => array_filter(['./layout' => './layout/', './assets' => $isProject ? null : './assets/', './assets-webpack' => './assets-webpack/']),
             ],
             $scripts,
         );
