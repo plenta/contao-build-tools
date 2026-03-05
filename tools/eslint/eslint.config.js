@@ -57,7 +57,7 @@ const configs = [{
 }];
 
 if (fs.existsSync('.eslintrc.json')) {
-    configs.push(JSON.parse(fs.readFileSync('.eslintrc.json')));
+    configs.push(...JSON.parse(fs.readFileSync('.eslintrc.json')));
 }
 
 export default defineConfig(configs);
