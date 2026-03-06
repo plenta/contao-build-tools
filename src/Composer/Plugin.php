@@ -125,11 +125,17 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             $scripts
         );
 
+        $biomeJson = 'vendor/plenta/contao-build-tools/tools/biome/%s';
+
+        if ($this->filesystem->exists('./biome.json')) {
+            $biomeJson = './%s';
+        }
+
         $this->registerConfigScript(
             'biome',
             'Run biome on the project files [plenta/contao-build-tools].',
-            'vendor/plenta/contao-build-tools/tools/biome/node_modules/.bin/biome check %s --write --unsafe  --config-path=vendor/plenta/contao-build-tools/tools/biome/%s --no-errors-on-unmatched',
-            'vendor/plenta/contao-build-tools/tools/biome/node_modules/.bin/biome ci %s --config-path=vendor/plenta/contao-build-tools/tools/biome/%s --no-errors-on-unmatched',
+            'vendor/plenta/contao-build-tools/tools/biome/node_modules/.bin/biome check %s --write --unsafe  --config-path='.$biomeJson.' --no-errors-on-unmatched',
+            'vendor/plenta/contao-build-tools/tools/biome/node_modules/.bin/biome ci %s --config-path='.$biomeJson.' --no-errors-on-unmatched',
             [
                 'biome.json' => array_filter(['./layout' => './layout/', './assets' => $isProject ? null : './assets/', './assets-webpack' => './assets-webpack/']),
             ],
