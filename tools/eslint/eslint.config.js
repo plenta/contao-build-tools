@@ -1,4 +1,4 @@
-import { defineConfig } from 'eslint/config';
+import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 import babelParser from '@babel/eslint-parser';
 import path from 'node:path';
@@ -53,8 +53,9 @@ const configs = [{
         }],
 
         'import/prefer-default-export': 'off',
+        'class-methods-use-this': 'off',
     },
-}];
+}, globalIgnores(['layout/vendor/*'])];
 
 if (fs.existsSync('.eslintrc.json')) {
     configs.push(...JSON.parse(fs.readFileSync('.eslintrc.json')));
