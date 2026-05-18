@@ -52,6 +52,95 @@ Ideas for additional tools that could be integrated:
  - maglnet/composer-require-checker
  - https://github.com/VincentLanglet/Twig-CS-Fixer
 
+## Overwriting Configs
+The plugin automatically scans the default Contao directories. You can override the paths used by individual tools by adding configuration under `extra.contao-build-tools.tools` in your project's `composer.json`.
+
+```json
+{
+    "extra": {
+        "contao-build-tools": {
+            "tools": {
+                "ecs": {
+                    "default": ["./custom-path"],
+                    "contao": ["./custom-path"],
+                    "template": ["./custom-path"]
+                },
+                "rector": {
+                    "config": ["./custom-path"]
+                },
+                "phpstan": {
+                    "config": ["./custom-path"]
+                },
+                "stylelint": {
+                    "stylelint.config.js": {
+                    }
+                },
+                "eslint": {
+                    "eslint.config.js": {
+                    }
+                },
+                "biome": {
+                    "biome.json": {
+                        "./custom-path": "./custom-path/**/*.js"
+                    }
+                },
+                "twig-cs-fixer": {
+                    "config": ["./custom-path"]
+                }
+            }
+        }
+    }
+}
+```
+
+If you want to customise the paths used by Composer Dependency Analyser, create a `composer-dependency-analyser.php` file in your project's root directory and return a `Configuration` instance.
+This completely replaces the default `pathsToScan` configuration provided by the plugin.
+
+```php
+
+<?php
+# composer-dependency-analyser.php
+
+declare(strict_types=1);
+
+use ShipMonk\ComposerDependencyAnalyser\Config\Configuration;
+
+$config = new Configuration();
+
+$paths = [
+    './custom-path' => false, // production code
+    './contao' => false,
+    './templates' => false,
+    './config' => false,
+    './tests' => true, // development-only code
+];
+
+foreach ($paths as $path => $isDev) {
+    if (file_exists($path)) {
+        $config->addPathToScan($path, $isDev);
+    }
+}
+
+return $config;
+
+```
+
+## Local Development
+
+To use the build tools locally, you first need to install the required npm dependencies. You can add the following script to your project's `package.json` to update all bundled tool dependencies.
+
+```json
+{
+    "scripts": {
+        "update-build-tools": "(cd vendor/plenta/contao-build-tools/tools/biome && npm update) && (cd vendor/plenta/contao-build-tools/tools/eslint && npm update) && (cd vendor/plenta/contao-build-tools/tools/stylelint && npm update)"
+    }
+}
+```
+
+Then run:
+```bash
+npm run update-build-tools
+```
 
 ## Continuous Integration
 
