@@ -45,6 +45,14 @@ The `stylelint` script will check your CSS formatting with [Stylelint](https://s
 
 You can extend the default configuration by adding a `.stylelintrc` file to your project root.
 
+You can ignore files by adding a `.stylelintignore` file to your project root.
+
+```gitignore
+# .stylelintignore
+layout/scss/vendor/*.scss
+layout/scss/other/**/*.scss
+```
+
 
 ### Ideas
 
