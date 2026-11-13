@@ -40,7 +40,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
     {
         $scripts = [];
         $isProject = $this->isProject($composer);
-        $phpSources = ['./src', './tests', './config/*.php' => './config'];
+        $rootPackage = $composer->getPackage();
+        $extra = $rootPackage->getExtra();
+        $config = $extra['contao-build-tools'] ?? [];
+
+        $phpSources = $config['php-sources'] ?? ['./src', './tests', './config/*.php' => './config'];
 
         if (!$isProject) {
             $phpSources[] = './bin';
@@ -52,9 +56,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             '@php vendor/plenta/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/plenta/contao-build-tools/tools/ecs/config/%s.php --fix --ansi',
             '@php vendor/plenta/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/plenta/contao-build-tools/tools/ecs/config/%s.php --no-progress-bar --no-interaction',
             [
-                'default' => $phpSources,
-                'contao' => ['./contao', self::LEGACY_MODULES],
-                'template' => ['./templates', './contao/templates'],
+                'default' => $this->getPaths('ecs', 'default', $phpSources, $config),
+                'contao' => $this->getPaths('ecs', 'contao', ['./contao', self::LEGACY_MODULES], $config),
+                'template' => $this->getPaths('ecs', 'template', ['./templates', './contao/templates'], $config),
             ],
             $scripts,
         );
@@ -65,7 +69,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             '@php vendor/plenta/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/plenta/contao-build-tools/tools/rector/%s.php --ansi',
             '@php vendor/plenta/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/plenta/contao-build-tools/tools/rector/%s.php --dry-run --no-progress-bar --no-diffs',
             [
-                'config' => [...$phpSources, './contao', './templates', self::LEGACY_MODULES]
+                'config' => $this->getPaths('rector', 'config', [...$phpSources, './contao', './templates', self::LEGACY_MODULES], $config)
             ],
             $scripts
         );
@@ -76,7 +80,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             '@php vendor/plenta/contao-build-tools/tools/phpstan/vendor/bin/phpstan analyze %s --ansi --configuration=vendor/plenta/contao-build-tools/tools/phpstan/%s.php',
             null,
             [
-                'config' => [...$phpSources, self::LEGACY_MODULES]
+                'config' => $this->getPaths('phpstan', 'config', [...$phpSources, self::LEGACY_MODULES], $config)
             ],
             $scripts
         );
@@ -87,7 +91,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             '@php vendor/plenta/contao-build-tools/tools/composer-dependency-analyser/vendor/bin/composer-dependency-analyser --composer-json=%s --config=vendor/plenta/contao-build-tools/tools/composer-dependency-analyser/%s.php',
             null,
             [
-                'config' => ['./composer.json'],
+                'config' => $this->getPaths('depcheck', 'config', ['./composer.json'], $config),
             ],
             $scripts
         );
@@ -98,7 +102,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             '@php vendor/plenta/contao-build-tools/tools/yamllint/vendor/bin/yaml-lint --parse-tags %s',
             null,
             [
-                '' => ['./config', './github'],
+                '' => $this->getPaths('yamllint', '', ['./config', './github'], $config),
             ],
             $scripts
         );
@@ -109,7 +113,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             'vendor/plenta/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/plenta/contao-build-tools/tools/stylelint/%s --allow-empty-input --fix',
             'vendor/plenta/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/plenta/contao-build-tools/tools/stylelint/%s --allow-empty-input',
             [
-                'stylelint.config.js' => array_filter(['./layout' => './layout/**/*.s?(a|c)ss', './assets' => $isProject ? null : './assets/**/*.s?(a|c)ss', './assets-webpack' => './assets-webpack/**/*.s?(a|c)ss']),
+                'stylelint.config.js' => $this->getPaths('stylelint', 'stylelint.config.js', array_filter(['./layout' => './layout/**/*.s?(a|c)ss', './assets' => $isProject ? null : './assets/**/*.s?(a|c)ss', './assets-webpack' => './assets-webpack/**/*.s?(a|c)ss']), $config),
             ],
             $scripts
         );
@@ -120,7 +124,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             'vendor/plenta/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/plenta/contao-build-tools/tools/eslint/%s --report-unused-disable-directives --no-error-on-unmatched-pattern --fix',
             'vendor/plenta/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/plenta/contao-build-tools/tools/eslint/%s --report-unused-disable-directives --no-error-on-unmatched-pattern',
             [
-                'eslint.config.js' => array_filter(['./layout' => './layout/**/*.js', './assets' => $isProject ? null : './assets/**/*.js', './assets-webpack' => './assets-webpack/**/*.js']),
+                'eslint.config.js' => $this->getPaths('eslint', 'eslint.config.js', array_filter(['./layout' => './layout/**/*.js', './assets' => $isProject ? null : './assets/**/*.js', './assets-webpack' => './assets-webpack/**/*.js']), $config),
             ],
             $scripts
         );
@@ -137,7 +141,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             'vendor/plenta/contao-build-tools/tools/biome/node_modules/.bin/biome check %s --write --unsafe  --config-path='.$biomeJson.' --no-errors-on-unmatched',
             'vendor/plenta/contao-build-tools/tools/biome/node_modules/.bin/biome ci %s --config-path='.$biomeJson.' --no-errors-on-unmatched',
             [
-                'biome.json' => array_filter(['./layout' => './layout/', './assets' => $isProject ? null : './assets/', './assets-webpack' => './assets-webpack/']),
+                'biome.json' => $this->getPaths('biome', 'biome.json', array_filter(['./layout' => './layout/', './assets' => $isProject ? null : './assets/', './assets-webpack' => './assets-webpack/']), $config),
             ],
             $scripts,
         );
@@ -148,7 +152,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             '@php vendor/plenta/contao-build-tools/tools/twig-cs-fixer/vendor/bin/twig-cs-fixer fix %s --config=vendor/plenta/contao-build-tools/tools/twig-cs-fixer/%s.php -v',
             '@php vendor/plenta/contao-build-tools/tools/twig-cs-fixer/vendor/bin/twig-cs-fixer check %s --config=vendor/plenta/contao-build-tools/tools/twig-cs-fixer/%s.php -v',
             [
-                'config' => ['./templates', './contao/templates'],
+                'config' => $this->getPaths('twig-cs-fixer', 'config', ['./templates', './contao/templates'], $config),
             ],
             $scripts,
         );
@@ -371,5 +375,13 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
     private function isProject(Composer $composer): bool
     {
         return 'project' === $composer->getPackage()->getType();
+    }
+
+    private function getPaths(string $tool, string $key, array $default, array $config): array
+    {
+        return $config['tools'][$tool][$key]
+            ?? $config[$tool.'-sources'][$key]
+            ?? $config[$tool.'-sources']
+            ?? $default;
     }
 }
