@@ -19,17 +19,20 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\Process;
 
 class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 {
     private const FIX_SCRIPT = 'fix-tools';
+
     private const CI_SCRIPT = 'build-tools';
+
     private const LEGACY_MODULES = './system/modules';
 
-    private Filesystem $filesystem;
     public array $activatedScripts = [];
+
     public array $scriptAliases = [];
+
+    private Filesystem $filesystem;
 
     public function __construct()
     {
@@ -52,9 +55,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
         $this->registerConfigScript(
             ['ecs', 'cs-fixer'],
-            'Run code style fixes on the project files [plenta/contao-build-tools].',
-            '@php vendor/plenta/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/plenta/contao-build-tools/tools/ecs/config/%s.php --fix --ansi',
-            '@php vendor/plenta/contao-build-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/plenta/contao-build-tools/tools/ecs/config/%s.php --no-progress-bar --no-interaction',
+            'Run code style fixes on the project files [terminal42/code-quality-tools].',
+            '@php vendor/plenta/contao-build-tools/tools/code-quality-tools/vendor/terminal42/code-quality-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/plenta/contao-build-tools/tools/ecs/%s.php --fix --ansi',
+            '@php vendor/plenta/contao-build-tools/tools/code-quality-tools/vendor/terminal42/code-quality-tools/tools/ecs/vendor/bin/ecs check %s --config vendor/plenta/contao-build-tools/tools/ecs/%s.php --no-progress-bar --no-interaction',
             [
                 'default' => $this->getPaths('ecs', 'default', $phpSources, $config),
                 'contao' => $this->getPaths('ecs', 'contao', ['./contao', self::LEGACY_MODULES], $config),
@@ -65,71 +68,71 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
         $this->registerConfigScript(
             'rector',
-            'Run Rector on the project files [plenta/contao-build-tools].',
-            '@php vendor/plenta/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/plenta/contao-build-tools/tools/rector/%s.php --ansi',
-            '@php vendor/plenta/contao-build-tools/tools/rector/vendor/bin/rector process %s --config vendor/plenta/contao-build-tools/tools/rector/%s.php --dry-run --no-progress-bar --no-diffs',
+            'Run Rector on the project files [terminal42/code-quality-tools].',
+            '@php vendor/plenta/contao-build-tools/tools/code-quality-tools/vendor/terminal42/code-quality-tools/tools/rector/vendor/bin/rector process %s --config vendor/plenta/contao-build-tools/tools/code-quality-tools/vendor/terminal42/code-quality-tools/tools/rector/%s.php --ansi',
+            '@php vendor/plenta/contao-build-tools/tools/code-quality-tools/vendor/terminal42/code-quality-tools/tools/rector/vendor/bin/rector process %s --config vendor/plenta/contao-build-tools/tools/code-quality-tools/vendor/terminal42/code-quality-tools/tools/rector/%s.php --dry-run --no-progress-bar --no-diffs',
             [
                 'config' => $this->getPaths('rector', 'config', [...$phpSources, './contao', './templates', self::LEGACY_MODULES], $config)
             ],
-            $scripts
+            $scripts,
         );
 
         $this->registerConfigScript(
             'phpstan',
-            'Run PHPStan on the project files [plenta/contao-build-tools].',
-            '@php vendor/plenta/contao-build-tools/tools/phpstan/vendor/bin/phpstan analyze %s --ansi --configuration=vendor/plenta/contao-build-tools/tools/phpstan/%s.php',
+            'Run PHPStan on the project files [terminal42/code-quality-tools].',
+            '@php vendor/plenta/contao-build-tools/tools/code-quality-tools/vendor/terminal42/code-quality-tools/tools/phpstan/vendor/bin/phpstan analyze %s --ansi --configuration=vendor/plenta/contao-build-tools/tools/phpstan/%s.php',
             null,
             [
-                'config' => $this->getPaths('phpstan', 'config', [...$phpSources, self::LEGACY_MODULES], $config)
+                'config' => [...$phpSources, self::LEGACY_MODULES],
             ],
-            $scripts
+            $scripts,
         );
 
         $this->registerConfigScript(
             'depcheck',
-            'Run Dependency Analyzer on the project files [plenta/contao-build-tools].',
-            '@php vendor/plenta/contao-build-tools/tools/composer-dependency-analyser/vendor/bin/composer-dependency-analyser --composer-json=%s --config=vendor/plenta/contao-build-tools/tools/composer-dependency-analyser/%s.php',
+            'Run Dependency Analyzer on the project files [terminal42/code-quality-tools].',
+            '@php vendor/plenta/contao-build-tools/tools/code-quality-tools/vendor/terminal42/code-quality-tools/tools/composer-dependency-analyser/vendor/bin/composer-dependency-analyser --composer-json=%s --config=vendor/plenta/contao-build-tools/tools/composer-dependency-analyser/%s.php',
             null,
             [
                 'config' => $this->getPaths('depcheck', 'config', ['./composer.json'], $config),
             ],
-            $scripts
+            $scripts,
         );
 
         $this->registerConfigScript(
             'yamllint',
-            'Run yamllint on the project files [plenta/contao-build-tools].',
-            '@php vendor/plenta/contao-build-tools/tools/yamllint/vendor/bin/yaml-lint --parse-tags %s',
+            'Run yamllint on the project files [terminal42/code-quality-tools].',
+            '@php vendor/plenta/contao-build-tools/tools/code-quality-tools/vendor/terminal42/code-quality-tools/tools/yamllint/vendor/bin/yaml-lint --parse-tags %s',
             null,
             [
                 '' => $this->getPaths('yamllint', '', ['./config', './github'], $config),
             ],
-            $scripts
+            $scripts,
         );
 
         $this->registerConfigScript(
             'stylelint',
-            'Run stylelint on the project files [plenta/contao-build-tools].',
-            'vendor/plenta/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/plenta/contao-build-tools/tools/stylelint/%s --allow-empty-input --fix',
-            'vendor/plenta/contao-build-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/plenta/contao-build-tools/tools/stylelint/%s --allow-empty-input',
+            'Run stylelint on the project files [terminal42/code-quality-tools].',
+            'vendor/plenta/contao-build-tools/tools/code-quality-tools/vendor/terminal42/code-quality-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/plenta/contao-build-tools/tools/stylelint/%s --allow-empty-input --fix',
+            'vendor/plenta/contao-build-tools/tools/code-quality-tools/vendor/terminal42/code-quality-tools/tools/stylelint/node_modules/.bin/stylelint %s --config vendor/plenta/contao-build-tools/tools/stylelint/%s --allow-empty-input',
             [
                 'stylelint.config.js' => $this->getPaths('stylelint', 'stylelint.config.js', array_filter(['./layout' => './layout/**/*.s?(a|c)ss', './assets' => $isProject ? null : './assets/**/*.s?(a|c)ss', './assets-webpack' => './assets-webpack/**/*.s?(a|c)ss']), $config),
             ],
-            $scripts
+            $scripts,
         );
 
         $this->registerConfigScript(
             'eslint',
-            'Run eslint on the project files [plenta/contao-build-tools].',
-            'vendor/plenta/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/plenta/contao-build-tools/tools/eslint/%s --report-unused-disable-directives --no-error-on-unmatched-pattern --fix',
-            'vendor/plenta/contao-build-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/plenta/contao-build-tools/tools/eslint/%s --report-unused-disable-directives --no-error-on-unmatched-pattern',
+            'Run eslint on the project files [terminal42/code-quality-tools].',
+            'vendor/plenta/contao-build-tools/tools/code-quality-tools/vendor/terminal42/code-quality-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/plenta/contao-build-tools/tools/eslint/%s --report-unused-disable-directives --no-error-on-unmatched-pattern --fix',
+            'vendor/plenta/contao-build-tools/tools/code-quality-tools/vendor/terminal42/code-quality-tools/tools/eslint/node_modules/.bin/eslint %s --config vendor/plenta/contao-build-tools/tools/eslint/%s --report-unused-disable-directives --no-error-on-unmatched-pattern',
             [
                 'eslint.config.js' => $this->getPaths('eslint', 'eslint.config.js', array_filter(['./layout' => './layout/**/*.js', './assets' => $isProject ? null : './assets/**/*.js', './assets-webpack' => './assets-webpack/**/*.js']), $config),
             ],
-            $scripts
+            $scripts,
         );
 
-        $biomeJson = 'vendor/plenta/contao-build-tools/tools/biome/%s';
+        $biomeJson = 'vendor/plenta/contao-build-tools/tools/code-quality-tools/vendor/terminal42/code-quality-tools/tools/biome/%s';
 
         if ($this->filesystem->exists('./biome.json')) {
             $biomeJson = './%s';
@@ -137,9 +140,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
         $this->registerConfigScript(
             'biome',
-            'Run biome on the project files [plenta/contao-build-tools].',
-            'vendor/plenta/contao-build-tools/tools/biome/node_modules/.bin/biome check %s --write --unsafe  --config-path='.$biomeJson.' --no-errors-on-unmatched',
-            'vendor/plenta/contao-build-tools/tools/biome/node_modules/.bin/biome ci %s --config-path='.$biomeJson.' --no-errors-on-unmatched',
+            'Run biome on the project files [terminal42/code-quality-tools].',
+            'vendor/plenta/contao-build-tools/tools/code-quality-tools/vendor/terminal42/code-quality-tools/tools/biome/node_modules/.bin/biome check %s --write --unsafe  --config-path='.$biomeJson.' --no-errors-on-unmatched',
+            'vendor/plenta/contao-build-tools/tools/code-quality-tools/vendor/terminal42/code-quality-tools/tools/biome/node_modules/.bin/biome ci %s --config-path='.$biomeJson.' --no-errors-on-unmatched',
             [
                 'biome.json' => $this->getPaths('biome', 'biome.json', array_filter(['./layout' => './layout/', './assets' => $isProject ? null : './assets/', './assets-webpack' => './assets-webpack/']), $config),
             ],
@@ -148,9 +151,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
         $this->registerConfigScript(
             'twig-cs-fixer',
-            'Run Twig-CS-Fixer on the project files [plenta/contao-build-tools].',
-            '@php vendor/plenta/contao-build-tools/tools/twig-cs-fixer/vendor/bin/twig-cs-fixer fix %s --config=vendor/plenta/contao-build-tools/tools/twig-cs-fixer/%s.php -v',
-            '@php vendor/plenta/contao-build-tools/tools/twig-cs-fixer/vendor/bin/twig-cs-fixer check %s --config=vendor/plenta/contao-build-tools/tools/twig-cs-fixer/%s.php -v',
+            'Run Twig-CS-Fixer on the project files [terminal42/code-quality-tools].',
+            'vendor/plenta/contao-build-tools/tools/code-quality-tools/vendor/terminal42/code-quality-tools/tools/twig-cs-fixer/vendor/bin/twig-cs-fixer fix %s --config=vendor/plenta/contao-build-tools/tools/twig-cs-fixer/%s.php -v',
+            'vendor/plenta/contao-build-tools/tools/code-quality-tools/vendor/terminal42/code-quality-tools/tools/twig-cs-fixer/vendor/bin/twig-cs-fixer check %s --config=vendor/plenta/contao-build-tools/tools/twig-cs-fixer/%s.php -v',
             [
                 'config' => $this->getPaths('twig-cs-fixer', 'config', ['./templates', './contao/templates'], $config),
             ],
@@ -166,8 +169,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         $rootPackage->setScripts(
             array_merge(
                 array_diff_key($scripts, $rootPackage->getScripts()),
-                $rootPackage->getScripts()
-            )
+                $rootPackage->getScripts(),
+            ),
         );
     }
 
@@ -202,7 +205,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             return;
         }
 
-        $event->getIO()->write('<warning>Updating tools …</warning>');
+        $event->getIO()->write('<warning>Updating build tools …</warning>');
         $this->executeAllNamespaces(new StringInput('update'), $event->getIO(), $event->getComposer());
     }
 
@@ -227,25 +230,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         }
 
         $originalWorkingDir = getcwd();
-        foreach ($binRoots as $binRoot) {
-            if (
-                $this->filesystem->exists($binRoot.'/package.json')
-                && (
-                    $this->filesystem->exists($originalWorkingDir.'/layout')
-                    || (
-                        $this->filesystem->exists($originalWorkingDir.'/assets')
-                        && !$this->isProject($composer)
-                    )
-                )
-            ) {
-                Process::fromShellCommandline('npm install')
-                    ->setWorkingDirectory($binRoot)
-                    ->mustRun(static function (string $type, string $buffer) use ($output) {
-                        $output->write($buffer);
-                    })
-                ;
-            }
 
+        // Let terminal42/code-quality-tools know where the actual project root is
+        $_ENV['PROJECT_ROOT'] = $originalWorkingDir;
+
+        foreach ($binRoots as $binRoot) {
             if ($this->filesystem->exists($binRoot.'/composer.json')) {
                 $this->executeInNamespace($application, $binRoot, $input, $output);
 
@@ -268,9 +257,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             $this->filesystem->dumpFile(Factory::getComposerFile(), '{}');
         }
 
-        $input = new StringInput((string) $input . ' --quiet --working-dir=.');
+        $input = new StringInput($input.' --quiet --working-dir=.');
 
-        $output->write('<info>Run with <comment>' . $input->__toString() . '</comment></info>', true, IOInterface::VERBOSE);
+        $output->write('<info>Run with <comment>'.$input->__toString().'</comment></info>', true, IOInterface::VERBOSE);
 
         return $application->doRun($input, $output);
     }
@@ -278,6 +267,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
     private function resetComposers(Application $application): void
     {
         $application->resetComposer();
+
         foreach ($application->all() as $command) {
             if ($command instanceof BaseCommand) {
                 $command->resetComposer();
@@ -285,7 +275,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
         }
     }
 
-    private function registerConfigScript($name, string $description, string $command, ?string $ciCommand, array $configs, array &$scripts, bool $addToTools = true): void
+    private function registerConfigScript($name, string $description, string $command, string|null $ciCommand, array $configs, array &$scripts, bool $addToTools = true): void
     {
         $aliases = (array) $name;
         $name = array_shift($aliases);
@@ -298,22 +288,22 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             }
 
             $this->addScript(
-                sprintf($command, '"'.implode('" "', $paths).'"', $config),
+                \sprintf($command, '"'.implode('" "', $paths).'"', $config),
                 $name,
-                $scripts
+                $scripts,
             );
 
             if ($addToTools) {
                 $this->addScript(
-                    sprintf($command, '"'.implode('" "', $paths).'"', $config),
+                    \sprintf($command, '"'.implode('" "', $paths).'"', $config),
                     self::FIX_SCRIPT,
-                    $scripts
+                    $scripts,
                 );
 
                 $this->addScript(
-                    sprintf($ciCommand ?? $command, '"'.implode('" "', $paths).'"', $config),
+                    \sprintf($ciCommand ?? $command, '"'.implode('" "', $paths).'"', $config),
                     self::CI_SCRIPT,
-                    $scripts
+                    $scripts,
                 );
             }
         }
@@ -323,8 +313,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             $this->scriptAliases[$name] = $aliases;
 
             if ($addToTools) {
-                $this->activatedScripts[self::CI_SCRIPT] = 'Run all tools for a CI build chain [plenta/contao-build-tools].';
-                $this->activatedScripts[self::FIX_SCRIPT] = 'Run fixers of all CI tools [plenta/contao-build-tools].';
+                $this->activatedScripts[self::CI_SCRIPT] = 'Run all tools for a CI build chain [terminal42/code-quality-tools].';
+                $this->activatedScripts[self::FIX_SCRIPT] = 'Run fixers of all CI tools [terminal42/code-quality-tools].';
             }
         }
     }
@@ -344,7 +334,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable
             }
 
             if (self::LEGACY_MODULES === $path) {
-                foreach(scandir(self::LEGACY_MODULES) as $dir) {
+                foreach (scandir(self::LEGACY_MODULES) as $dir) {
                     if ('.' === $dir || '..' === $dir) {
                         continue;
                     }

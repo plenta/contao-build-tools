@@ -2,3 +2,4 @@
 /tools/**/composer.lock
 /vendor
 /composer.lock
+/tools/**/node_modules

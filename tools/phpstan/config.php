@@ -1,8 +1,8 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
-$includes = [__DIR__.'/config.neon'];
+$includes = [__DIR__.'/../code-quality-tools/vendor/terminal42/code-quality-tools/tools/phpstan/config.neon', __DIR__.'/config.neon'];
 $files = [
     'phpstan.neon',
     'phpstan.neon.dist',
@@ -23,5 +23,9 @@ if (file_exists(getcwd().'/phpstan_full.neon')) {
 
 $config = [];
 $config['includes'] = $includes;
+
+if ($cacheDirectory = getenv('CODE_QUALITY_CACHE_DIR')) {
+    $config['parameters']['tmpDir'] = $cacheDirectory.'/phpstan';
+}
 
 return $config;
