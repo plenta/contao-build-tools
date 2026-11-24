@@ -19,7 +19,6 @@ $skip = [
     PhpdocNoAliasTagFixer::class,
     PhpdocSeparationFixer::class,
     PhpdocSummaryFixer::class,
-    Symplify\CodingStandard\Fixer\Commenting\ParamReturnAndVarTagMalformsFixer::class,
 ];
 
 $builder = ECSConfig::configure()

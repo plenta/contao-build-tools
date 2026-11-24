@@ -10,7 +10,6 @@ $builder = ECSConfig::configure()
     ->withSkip([
         '*/templates/*',
         DeclareStrictTypesFixer::class,
-        Symplify\CodingStandard\Fixer\Commenting\ParamReturnAndVarTagMalformsFixer::class,
     ])
     ->withCache(sys_get_temp_dir().'/ecs_contao_cache')
 ;
